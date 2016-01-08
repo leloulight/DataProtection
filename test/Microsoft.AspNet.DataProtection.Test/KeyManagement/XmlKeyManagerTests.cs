@@ -8,6 +8,8 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNet.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNet.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNet.DataProtection.Internal;
+using Microsoft.AspNet.DataProtection.KeyManagement.Internal;
 using Microsoft.AspNet.DataProtection.Repositories;
 using Microsoft.AspNet.DataProtection.XmlEncryption;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,8 +39,8 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
             mockFallback.Setup(o => o.GetKeyRepository()).Returns(expectedRepository);
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IDefaultKeyServices>(mockFallback.Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IDefaultKeyServices>(mockFallback.Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
             var services = serviceCollection.BuildServiceProvider();
 
             // Act
@@ -58,9 +60,9 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
             mockFallback.Setup(o => o.GetKeyRepository()).Returns(new Mock<IXmlRepository>().Object);
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IDefaultKeyServices>(mockFallback.Object);
-            serviceCollection.AddInstance<IXmlEncryptor>(new Mock<IXmlEncryptor>().Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IDefaultKeyServices>(mockFallback.Object);
+            serviceCollection.AddSingleton<IXmlEncryptor>(new Mock<IXmlEncryptor>().Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
             var services = serviceCollection.BuildServiceProvider();
 
             // Act & assert - we don't care about exception type, only exception message
@@ -97,8 +99,8 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(mockXmlRepository.Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(mockConfiguration.Object);
+            serviceCollection.AddSingleton<IXmlRepository>(mockXmlRepository.Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(mockConfiguration.Object);
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
 
@@ -188,9 +190,9 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(mockXmlRepository.Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(mockConfiguration.Object);
-            serviceCollection.AddInstance<IKeyEscrowSink>(mockKeyEscrow.Object);
+            serviceCollection.AddSingleton<IXmlRepository>(mockXmlRepository.Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(mockConfiguration.Object);
+            serviceCollection.AddSingleton<IKeyEscrowSink>(mockKeyEscrow.Object);
             serviceCollection.AddSingleton<IXmlEncryptor, NullXmlEncryptor>();
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
@@ -288,9 +290,9 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(new Mock<IXmlRepository>().Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
-            serviceCollection.AddInstance<IInternalXmlKeyManager>(mockInternalKeyManager.Object);
+            serviceCollection.AddSingleton<IXmlRepository>(new Mock<IXmlRepository>().Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IInternalXmlKeyManager>(mockInternalKeyManager.Object);
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
 
@@ -512,31 +514,7 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
         }
 
         [Fact]
-        public void GetAllKeys_WithKeyDeserializationError_LogLevelVerbose_DoesNotWriteSensitiveInformation()
-        {
-            // Arrange
-            const string xml = @"
-                <root>
-                  <!-- The below key will throw an exception when deserializing. -->
-                  <key id='78cd498e-9375-4e55-ac0d-d79527ecd09d' version='1'>
-                    <creationDate>2015-01-01T00:00:00Z</creationDate>
-                    <activationDate>2015-02-01T00:00:00Z</activationDate>
-                    <expirationDate>NOT A VALID DATE</expirationDate>
-                    <!-- Secret information: 1A2B3C4D -->
-                  </key>
-                </root>";
-
-            var loggerFactory = new StringLoggerFactory(LogLevel.Verbose);
-
-            // Act
-            RunGetAllKeysCore(xml, new Mock<IActivator>().Object, loggerFactory).ToArray();
-
-            // Assert
-            Assert.False(loggerFactory.ToString().Contains("1A2B3C4D"), "The secret '1A2B3C4D' should not have been logged.");
-        }
-
-        [Fact]
-        public void GetAllKeys_WithKeyDeserializationError_LogLevelDebug_WritesSensitiveInformation()
+        public void GetAllKeys_WithKeyDeserializationError_LogLevelDebug_DoesNotWriteSensitiveInformation()
         {
             // Arrange
             const string xml = @"
@@ -551,6 +529,30 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
                 </root>";
 
             var loggerFactory = new StringLoggerFactory(LogLevel.Debug);
+
+            // Act
+            RunGetAllKeysCore(xml, new Mock<IActivator>().Object, loggerFactory).ToArray();
+
+            // Assert
+            Assert.False(loggerFactory.ToString().Contains("1A2B3C4D"), "The secret '1A2B3C4D' should not have been logged.");
+        }
+
+        [Fact]
+        public void GetAllKeys_WithKeyDeserializationError_LogLevelTrace_WritesSensitiveInformation()
+        {
+            // Arrange
+            const string xml = @"
+                <root>
+                  <!-- The below key will throw an exception when deserializing. -->
+                  <key id='78cd498e-9375-4e55-ac0d-d79527ecd09d' version='1'>
+                    <creationDate>2015-01-01T00:00:00Z</creationDate>
+                    <activationDate>2015-02-01T00:00:00Z</activationDate>
+                    <expirationDate>NOT A VALID DATE</expirationDate>
+                    <!-- Secret information: 1A2B3C4D -->
+                  </key>
+                </root>";
+
+            var loggerFactory = new StringLoggerFactory(LogLevel.Trace);
 
             // Act
             RunGetAllKeysCore(xml, new Mock<IActivator>().Object, loggerFactory).ToArray();
@@ -584,12 +586,12 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(mockXmlRepository.Object);
-            serviceCollection.AddInstance<IActivator>(activator);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IXmlRepository>(mockXmlRepository.Object);
+            serviceCollection.AddSingleton<IActivator>(activator);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
             if (loggerFactory != null)
             {
-                serviceCollection.AddInstance<ILoggerFactory>(loggerFactory);
+                serviceCollection.AddSingleton<ILoggerFactory>(loggerFactory);
             }
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
@@ -615,8 +617,8 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(mockXmlRepository.Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IXmlRepository>(mockXmlRepository.Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
 
@@ -664,8 +666,8 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(mockXmlRepository.Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IXmlRepository>(mockXmlRepository.Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
 
@@ -716,9 +718,9 @@ namespace Microsoft.AspNet.DataProtection.KeyManagement
 
             // Arrange - services
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IXmlRepository>(new Mock<IXmlRepository>().Object);
-            serviceCollection.AddInstance<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
-            serviceCollection.AddInstance<IInternalXmlKeyManager>(mockInternalKeyManager.Object);
+            serviceCollection.AddSingleton<IXmlRepository>(new Mock<IXmlRepository>().Object);
+            serviceCollection.AddSingleton<IAuthenticatedEncryptorConfiguration>(new Mock<IAuthenticatedEncryptorConfiguration>().Object);
+            serviceCollection.AddSingleton<IInternalXmlKeyManager>(mockInternalKeyManager.Object);
             var services = serviceCollection.BuildServiceProvider();
             var keyManager = new XmlKeyManager(services);
 

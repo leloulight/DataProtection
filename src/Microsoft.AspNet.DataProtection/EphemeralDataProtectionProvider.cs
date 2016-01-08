@@ -5,6 +5,7 @@ using System;
 using Microsoft.AspNet.Cryptography.Cng;
 using Microsoft.AspNet.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNet.DataProtection.KeyManagement;
+using Microsoft.AspNet.DataProtection.KeyManagement.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNet.DataProtection
@@ -48,10 +49,7 @@ namespace Microsoft.AspNet.DataProtection
             }
 
             var logger = services.GetLogger<EphemeralDataProtectionProvider>();
-            if (logger.IsWarningLevelEnabled())
-            {
-                logger.LogWarning("Using ephemeral data protection provider. Payloads will be undecipherable upon application shutdown.");
-            }
+            logger?.UsingEphemeralDataProtectionProvider();
 
             _dataProtectionProvider = new KeyRingBasedDataProtectionProvider(keyringProvider, services);
         }

@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+#if !DNXCORE50
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
@@ -29,7 +30,7 @@ namespace Microsoft.AspNet.DataProtection.XmlEncryption
                     encryptedXml.AddKeyNameMapping("theKey", symmetricAlgorithm); // use symmetric encryption
                     return encryptedXml.Encrypt(element, "theKey");
                 });
-            serviceCollection.AddInstance<IInternalCertificateXmlEncryptor>(mockInternalEncryptor.Object);
+            serviceCollection.AddSingleton<IInternalCertificateXmlEncryptor>(mockInternalEncryptor.Object);
 
             var mockInternalDecryptor = new Mock<IInternalEncryptedXmlDecryptor>();
             mockInternalDecryptor.Setup(o => o.PerformPreDecryptionSetup(It.IsAny<EncryptedXml>()))
@@ -37,7 +38,7 @@ namespace Microsoft.AspNet.DataProtection.XmlEncryption
                 {
                     encryptedXml.AddKeyNameMapping("theKey", symmetricAlgorithm); // use symmetric encryption
                 });
-            serviceCollection.AddInstance<IInternalEncryptedXmlDecryptor>(mockInternalDecryptor.Object);
+            serviceCollection.AddSingleton<IInternalEncryptedXmlDecryptor>(mockInternalDecryptor.Object);
 
             var services = serviceCollection.BuildServiceProvider();
             var encryptor = new CertificateXmlEncryptor(services);
@@ -58,3 +59,5 @@ namespace Microsoft.AspNet.DataProtection.XmlEncryption
         }
     }
 }
+#endif
+

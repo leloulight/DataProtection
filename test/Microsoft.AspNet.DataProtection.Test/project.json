@@ -1,10 +1,15 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "Microsoft.AspNet.DataProtection": "1.0.0-rc1-final",
+=======
+    "Microsoft.AspNet.DataProtection": "1.0.0-*",
+>>>>>>> refs/remotes/aspnet/dev
     "Microsoft.AspNet.DataProtection.Test.Shared": {
       "type": "build",
       "version": ""
     },
+<<<<<<< HEAD
     "Microsoft.AspNet.Testing": "1.0.0-rc1-final",
     "Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
     "Moq": "4.2.1312.1622",
@@ -13,6 +18,27 @@
   "frameworks": {
     "dnx451": {}
   },
+=======
+    "Microsoft.AspNet.Testing": "1.0.0-*",
+    "Microsoft.Extensions.DependencyInjection": "1.0.0-*",
+    "xunit": "2.1.0"
+  },
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "Moq": "4.2.1312.1622",
+        "xunit.runner.console": "2.1.0"
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "moq.netcore": "4.4.0-beta8",
+        "xunit.runner.aspnet": "2.0.0-aspnet-*"
+      }
+    }
+  },
+  "testRunner": "xunit",
+>>>>>>> refs/remotes/aspnet/dev
   "commands": {
     "test": "xunit.runner.aspnet"
   },
@@ -21,4 +47,8 @@
     "warningsAsErrors": true,
     "keyFile": "../../tools/Key.snk"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> refs/remotes/aspnet/dev

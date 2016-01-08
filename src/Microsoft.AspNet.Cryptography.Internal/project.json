@@ -10,11 +10,19 @@
     "net451": {},
     "dotnet5.4": {
       "dependencies": {
+<<<<<<< HEAD
         "System.Diagnostics.Debug": "4.0.11-beta-23516",
         "System.Runtime.Handles": "4.0.1-beta-23516",
         "System.Runtime.InteropServices": "4.0.21-beta-23516",
         "System.Security.Cryptography.Primitives": "4.0.0-beta-23516",
         "System.Threading": "4.0.11-beta-23516"
+=======
+        "System.Diagnostics.Debug": "4.0.11-*",
+        "System.Runtime.Handles": "4.0.1-*",
+        "System.Runtime.InteropServices": "4.0.21-*",
+        "System.Security.Cryptography.Primitives": "4.0.0-*",
+        "System.Threading": "4.0.11-*"
+>>>>>>> refs/remotes/aspnet/dev
       }
     }
   },

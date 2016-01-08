@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Xml.Linq;
+using Microsoft.AspNet.DataProtection.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
@@ -39,7 +40,7 @@ namespace Microsoft.AspNet.DataProtection.XmlEncryption
             mockActivator.ReturnDecryptedElementGivenDecryptorTypeNameAndInput("theDecryptor", "<node />", "<newNode />");
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IActivator>(mockActivator.Object);
+            serviceCollection.AddSingleton<IActivator>(mockActivator.Object);
             var services = serviceCollection.BuildServiceProvider();
             var activator = services.GetActivator();
 
@@ -89,7 +90,7 @@ namespace Microsoft.AspNet.DataProtection.XmlEncryption
             mockActivator.Setup(o => o.CreateInstance(typeof(IXmlDecryptor), "myDecryptor")).Returns(mockDecryptor.Object);
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IActivator>(mockActivator.Object);
+            serviceCollection.AddSingleton<IActivator>(mockActivator.Object);
             var services = serviceCollection.BuildServiceProvider();
             var activator = services.GetActivator();
 

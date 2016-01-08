@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNet.DataProtection.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
@@ -72,7 +73,7 @@ namespace Microsoft.AspNet.DataProtection
             // Arrange
             var expectedActivator = new Mock<IActivator>().Object;
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddInstance<IActivator>(expectedActivator);
+            serviceCollection.AddSingleton<IActivator>(expectedActivator);
 
             // Act
             var actualActivator = serviceCollection.BuildServiceProvider().GetActivator();

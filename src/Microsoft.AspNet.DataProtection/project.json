@@ -12,9 +12,15 @@
       "type": "build",
       "version": "1.0.0-rc1-final"
     },
+<<<<<<< HEAD
     "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-rc1-final",
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
     "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final"
+=======
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*",
+    "Microsoft.Extensions.Options": "1.0.0-*"
+>>>>>>> refs/remotes/aspnet/dev
   },
   "frameworks": {
     "net451": {
@@ -27,6 +33,7 @@
     },
     "dotnet5.4": {
       "dependencies": {
+<<<<<<< HEAD
         "Microsoft.Win32.Registry": "4.0.0-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Reflection.Extensions": "4.0.1-beta-23516",
@@ -35,6 +42,13 @@
         "System.Security.Claims": "4.0.1-beta-23516",
         "System.Security.Principal.Windows": "4.0.0-beta-23516",
         "System.Xml.XDocument": "4.0.11-beta-23516"
+=======
+        "Microsoft.Win32.Registry": "4.0.0-*",
+        "System.Security.Cryptography.X509Certificates": "4.0.0-*",
+        "System.Security.Claims": "4.0.1-*",
+        "System.Security.Principal.Windows": "4.0.0-*",
+        "System.Xml.XDocument": "4.0.11-*"
+>>>>>>> refs/remotes/aspnet/dev
       }
     }
   },

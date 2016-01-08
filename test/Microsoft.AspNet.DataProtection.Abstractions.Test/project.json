@@ -1,5 +1,6 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "Microsoft.AspNet.Cryptography.Internal": "1.0.0-rc1-final",
     "Microsoft.AspNet.DataProtection.Abstractions": "1.0.0-rc1-final",
     "Microsoft.AspNet.Testing": "1.0.0-rc1-final",
@@ -13,8 +14,38 @@
     "test": "xunit.runner.aspnet"
   },
   "compile": "..\\common\\**\\*.cs",
+=======
+    "Microsoft.AspNet.Cryptography.Internal": "1.0.0-*",
+    "Microsoft.AspNet.DataProtection.Abstractions": "1.0.0-*",
+    "Microsoft.AspNet.Testing": "1.0.0-*",
+    "xunit": "2.1.0"
+  },
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+        "Moq": "4.2.1312.1622",
+        "xunit.runner.console": "2.1.0"
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "moq.netcore": "4.4.0-beta8",
+        "xunit.runner.aspnet": "2.0.0-aspnet-*"
+      }
+    }
+  },
+  "testRunner": "xunit",
+  "commands": {
+    "test": "xunit.runner.aspnet"
+  },
+  "compile": "../common/**/*.cs",
+>>>>>>> refs/remotes/aspnet/dev
   "compilationOptions": {
     "warningsAsErrors": true,
     "keyFile": "../../tools/Key.snk"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> refs/remotes/aspnet/dev
